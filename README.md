@@ -20,15 +20,15 @@ To develop for Squoosh:
 1. Clone the repository
 1. To install node packages, run:
    ```sh
-   npm install
+   pnpm install
    ```
 1. Then build the app by running:
    ```sh
-   npm run build
+   pnpm build
    ```
 1. After building, start the development server by running:
    ```sh
-   npm run dev
+   pnpm dev
    ```
 
 # Contributing

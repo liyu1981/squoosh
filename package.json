@@ -6,6 +6,7 @@
   "engines": {
     "node": ">=24.0.0"
   },
+  "packageManager": "pnpm@12.4.2",
   "scripts": {
     "build": "rollup -c && node lib/move-output.js",
     "debug": "node --inspect-brk node_modules/.bin/rollup -c",
@@ -30,6 +31,7 @@
     "dedent": "^0.7.0",
     "del": "^5.1.0",
     "file-drop-element": "^1.0.1",
+    "glob": "^7.1.6",
     "husky": "^7.0.2",
     "idb-keyval": "^3.2.0",
     "image-size": "^0.9.3",
