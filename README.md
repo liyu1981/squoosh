@@ -18,7 +18,9 @@ However, Squoosh utilizes Google Analytics to collect the following:
 To develop for Squoosh:
 
 1. Clone the repository
-1. To install node packages, run:
+1. This project uses [pnpm](https://pnpm.io) (pinned via the `packageManager`
+   field). Either enable [corepack](https://nodejs.org/api/corepack.html) or
+   install pnpm, then install node packages:
    ```sh
    pnpm install
    ```
@@ -30,6 +32,32 @@ To develop for Squoosh:
    ```sh
    pnpm dev
    ```
+
+# Deploying
+
+The site is deployed to Cloudflare Pages with `wrangler` (see `wrangler.toml`).
+The `name` field there must match the name of the Pages project.
+
+```sh
+pnpm build
+pnpm run deploy
+```
+
+`pnpm run deploy` checks the output against Cloudflare's limits and then runs
+`wrangler pages deploy build`. Use `pnpm run deploy` rather than plain
+`pnpm deploy`, which is a pnpm built-in command.
+
+The deploy checks (`scripts/check-asset-size.mjs`) fail if a file is larger
+than Cloudflare's 25 MiB per-file limit or if there are more than 20,000 files:
+
+- The wasm codecs are ~17 MiB in total across 23 files, the largest being
+  ~2.7 MiB. They are uploaded as ordinary static assets, so there is no
+  20 MiB bundle limit and no need to stitch or split them.
+- Codecs are only fetched by the worker that needs them, one module per
+  worker, so a browser never holds all of them in memory at once.
+
+Cloudflare build settings: build command `pnpm build`, deploy command
+`pnpm run deploy`.
 
 # Contributing
 

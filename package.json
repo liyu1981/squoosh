@@ -15,7 +15,9 @@
     "watch": "rollup -cw",
     "serve": "serve --listen=$DEV_PORT --config ../../../serve.json .tmp/build/static",
     "prepare": "husky",
-    "deploy": "wrangler pages deploy build"
+    "deploy": "pnpm check-size && wrangler pages deploy build",
+    "check-size": "node scripts/check-asset-size.mjs build",
+    "postbuild": "node scripts/check-asset-size.mjs build"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.3",
