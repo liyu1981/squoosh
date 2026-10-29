@@ -2,6 +2,17 @@
 
 [Squoosh] is an image compression web app that reduces image sizes through numerous formats.
 
+# About this repository
+
+This is a fork of [GoogleChromeLabs/squoosh](https://github.com/GoogleChromeLabs/squoosh).
+The original project is no longer actively maintained, so the goal here is to
+modernize the toolchain (pnpm, Node 24, TypeScript 7, Rollup 4, current
+PostCSS/Preact and friends) and deploy it to
+[Cloudflare Pages](https://pages.cloudflare.com) with `wrangler`.
+
+See [Deploying](#deploying) for the build/deploy commands, and the fork's
+`cloudflare-deploy` branch for the deployment-specific configuration.
+
 # Privacy
 
 Squoosh does not send your image to a server. All image compression processes locally.
