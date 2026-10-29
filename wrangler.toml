@@ -1,0 +1,4 @@
+# Cloudflare Pages configuration.
+# `name` must match the Pages project name in your Cloudflare account.
+name = "squoosh"
+pages_build_output_dir = "./build"
