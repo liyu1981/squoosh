@@ -3,3 +3,4 @@ allowBuilds:
   workerd: true
 patchedDependencies:
   '@surma/rollup-plugin-off-main-thread@2.2.2': patches/@surma__rollup-plugin-off-main-thread@2.2.2.patch
+  '@web/rollup-plugin-import-meta-assets@3.0.0': patches/@web__rollup-plugin-import-meta-assets@3.0.0.patch

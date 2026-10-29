@@ -1,0 +1,19 @@
+diff --git a/src/rollup-plugin-import-meta-assets.js b/src/rollup-plugin-import-meta-assets.js
+index 708cd4b8689160c82931e19a5becca9571afb7b3..0f17f584e9e2bb053c09e62e6e3b0e91ddb12cfd 100644
+--- a/src/rollup-plugin-import-meta-assets.js
++++ b/src/rollup-plugin-import-meta-assets.js
+@@ -313,9 +313,12 @@ ${`    default: return new Promise(function(resolve, reject) {
+               source: assetContents,
+             });
+             ms2 = ms2 || new MagicString(newCode);
++            // Only replace the asset path, keep `, import.meta.url` as the
++            // base: `new URL("<path>")` throws in workers, where there is no
++            // document base URL.
+             ms2.overwrite(
+               node.arguments[0].start,
+-              node.arguments[1].end,
++              node.arguments[0].end,
+               `import.meta.ROLLUP_FILE_URL_${ref}`,
+             );
+           }
+

@@ -17,7 +17,8 @@
     "prepare": "husky",
     "deploy": "pnpm check-size && wrangler pages deploy build",
     "check-size": "node scripts/check-asset-size.mjs build",
-    "postbuild": "node scripts/check-asset-size.mjs build"
+    "postbuild": "node scripts/check-asset-size.mjs build",
+    "smoke": "node scripts/smoke-test.mjs"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.3",

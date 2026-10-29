@@ -43,6 +43,13 @@ To develop for Squoosh:
    ```sh
    pnpm dev
    ```
+1. Optionally, run the end-to-end smoke test (needs a local Chromium; set
+   `CHROME_PATH` if it isn't in a standard location). It serves `build/`,
+   drops an image on the app and fails on any console error or exception:
+   ```sh
+   pnpm build
+   pnpm smoke
+   ```
 
 # Deploying
 
