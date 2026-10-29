@@ -1,4 +1,4 @@
-interface LoadingSpinner extends preact.JSX.HTMLAttributes {}
+interface LoadingSpinner extends preact.JSX.AllHTMLAttributes {}
 
 declare module 'preact' {
   namespace createElement.JSX {

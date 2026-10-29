@@ -1,7 +1,7 @@
 import type { SnackOptions } from '.';
 import type preact from 'preact';
 
-interface SnackBarAttributes extends preact.JSX.HTMLAttributes {
+interface SnackBarAttributes extends preact.JSX.AllHTMLAttributes {
   showSnackbar?: (options: SnackOptions) => Promise<string>;
 }
 

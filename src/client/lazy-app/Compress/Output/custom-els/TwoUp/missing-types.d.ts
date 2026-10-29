@@ -1,4 +1,4 @@
-interface TwoUpAttributes extends preact.JSX.HTMLAttributes {
+interface TwoUpAttributes extends preact.JSX.AllHTMLAttributes {
   orientation?: string;
   'legacy-clip-compat'?: boolean;
 }

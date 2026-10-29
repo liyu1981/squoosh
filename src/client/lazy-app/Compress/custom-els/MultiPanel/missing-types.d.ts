@@ -1,4 +1,4 @@
-interface MultiPanelAttributes extends preact.JSX.HTMLAttributes {
+interface MultiPanelAttributes extends preact.JSX.AllHTMLAttributes {
   'open-one-only'?: boolean;
 }
 
