@@ -1,3 +1,5 @@
 allowBuilds:
   esbuild: true
   workerd: true
+patchedDependencies:
+  '@surma/rollup-plugin-off-main-thread@2.2.2': patches/@surma__rollup-plugin-off-main-thread@2.2.2.patch

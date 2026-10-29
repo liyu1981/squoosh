@@ -11,8 +11,8 @@
  * limitations under the License.
  */
 import * as path from 'path';
-import { promises as fsp } from 'fs';
-import del from 'del';
+import { promises as fsp, rmSync } from 'fs';
+import { fileURLToPath } from 'url';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import terser from '@rollup/plugin-terser';
@@ -20,19 +20,19 @@ import OMT from '@surma/rollup-plugin-off-main-thread';
 import replace from '@rollup/plugin-replace';
 import { importMetaAssets } from '@web/rollup-plugin-import-meta-assets';
 
-import simpleTS from './lib/simple-ts';
-import clientBundlePlugin from './lib/client-bundle-plugin';
-import nodeExternalPlugin from './lib/node-external-plugin';
-import cssPlugin from './lib/css-plugin';
-import urlPlugin from './lib/url-plugin';
-import resolveDirsPlugin from './lib/resolve-dirs-plugin';
-import runScript from './lib/run-script';
-import emitFiles from './lib/emit-files-plugin';
-import featurePlugin from './lib/feature-plugin';
-import initialCssPlugin from './lib/initial-css-plugin';
-import serviceWorkerPlugin from './lib/sw-plugin';
-import dataURLPlugin from './lib/data-url-plugin';
-import entryDataPlugin, { fileNameToURL } from './lib/entry-data-plugin';
+import simpleTS from './lib/simple-ts.js';
+import clientBundlePlugin from './lib/client-bundle-plugin.js';
+import nodeExternalPlugin from './lib/node-external-plugin.js';
+import cssPlugin from './lib/css-plugin.js';
+import urlPlugin from './lib/url-plugin.js';
+import resolveDirsPlugin from './lib/resolve-dirs-plugin.js';
+import runScript from './lib/run-script.js';
+import emitFiles from './lib/emit-files-plugin.js';
+import featurePlugin from './lib/feature-plugin.js';
+import initialCssPlugin from './lib/initial-css-plugin.js';
+import serviceWorkerPlugin from './lib/sw-plugin.js';
+import dataURLPlugin from './lib/data-url-plugin.js';
+import entryDataPlugin, { fileNameToURL } from './lib/entry-data-plugin.js';
 import dedent from 'dedent';
 
 function resolveFileUrl({ fileName }) {
@@ -50,6 +50,8 @@ function resolveImportMetaUrlInStaticBuild(property, { moduleId }) {
   `);
 }
 
+const dirName = path.dirname(fileURLToPath(import.meta.url));
+
 const dir = '.tmp/build';
 const staticPath = 'static/c/[name]-[hash][extname]';
 const jsPath = staticPath.replace('[extname]', '.js');
@@ -65,19 +67,22 @@ function jsFileName(chunkInfo) {
 
 export default async function ({ watch }) {
   const omtLoaderPromise = fsp.readFile(
-    path.join(__dirname, 'lib', 'omt.ejs'),
+    path.join(dirName, 'lib', 'omt.ejs'),
     'utf-8',
   );
 
-  await del('.tmp/build');
+  rmSync('.tmp/build', { recursive: true, force: true });
+  // The package is an ES module, but the static build is CommonJS and gets
+  // executed by Node. This file isn't part of the deployed output.
+  await fsp.mkdir(dir, { recursive: true });
+  await fsp.writeFile(path.join(dir, 'package.json'), '{"type":"commonjs"}\n');
 
   const isProduction = !watch;
 
-  const tsPluginInstance = simpleTS('.', {
-    watch,
-  });
   const commonPlugins = () => [
-    tsPluginInstance,
+    simpleTS('.', {
+      watch,
+    }),
     resolveDirsPlugin([
       'src/static-build',
       'src/client',
@@ -101,6 +106,7 @@ export default async function ({ watch }) {
       format: 'cjs',
       assetFileNames: staticPath,
       exports: 'named',
+      preserveModules: true,
     },
     watch: {
       clearScreen: false,
@@ -111,7 +117,6 @@ export default async function ({ watch }) {
       // although we may need to change this number over time.
       buildDelay: 250,
     },
-    preserveModules: true,
     plugins: [
       { resolveFileUrl, resolveImportMeta: resolveImportMetaUrlInStaticBuild },
       clientBundlePlugin(
@@ -127,7 +132,11 @@ export default async function ({ watch }) {
             ...commonPlugins(),
             commonjs(),
             resolve(),
-            replace({ __PRERENDER__: false, __PRODUCTION__: isProduction }),
+            replace({
+              __PRERENDER__: false,
+              __PRODUCTION__: isProduction,
+              preventAssignment: true,
+            }),
             entryDataPlugin(),
             isProduction ? terser({ module: true }) : {},
           ],
@@ -145,10 +154,14 @@ export default async function ({ watch }) {
         resolveFileUrl,
       ),
       ...commonPlugins(),
-      emitFiles({ include: '**/*', root: path.join(__dirname, 'src', 'copy') }),
+      emitFiles({ include: '**/*', root: path.join(dirName, 'src', 'copy') }),
       nodeExternalPlugin(),
       featurePlugin(),
-      replace({ __PRERENDER__: true, __PRODUCTION__: isProduction }),
+      replace({
+        __PRERENDER__: true,
+        __PRODUCTION__: isProduction,
+        preventAssignment: true,
+      }),
       initialCssPlugin(),
       runScript(dir + '/static-build/index.js'),
     ],

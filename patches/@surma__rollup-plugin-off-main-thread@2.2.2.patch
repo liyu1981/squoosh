@@ -1,0 +1,33 @@
+diff --git a/index.js b/index.js
+index 391d1057ee60b75b6b0bfc64ad300614549fcaed..981ce2a3843291710156e0c0ac97d9c8943323e2 100644
+--- a/index.js
++++ b/index.js
+@@ -14,7 +14,7 @@
+ "use strict";
+ 
+ const { readFileSync } = require("fs");
+-const { join } = require("path");
++const { join, dirname, resolve } = require("path");
+ const ejs = require("ejs");
+ const MagicString = require("magic-string");
+ const json5 = require("json5");
+@@ -171,7 +171,18 @@ This will become a hard error in the future.`,
+             }
+           }
+ 
+-          workerIdPromise = this.resolve(workerFile, id).then(res => res.id);
++          // Rolling up a module that is currently being transformed deadlocks
++          // in Rollup 3+. A worker that refers to its own file (as
++          // wasm-bindgen-rayon does) is the `import.meta.url` case anyway.
++          const selfResolved = resolve(dirname(id), workerFile);
++          workerIdPromise =
++            selfResolved === id
++              ? Promise.resolve(id)
++              : this.resolve(workerFile, id).then(res => {
++                  if (!res)
++                    throw Error(`Cannot find module '${workerFile}' from '${id}'`);
++                  return res.id;
++                });
+         }
+ 
+         replacementPromises.push(
